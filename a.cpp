@@ -139,7 +139,10 @@ int main() {
     
     vSnake snake;
     //food
-    int random_x = abs(rand()) % (screen_width - 100), random_y = abs(rand()) % (screen_height - 100);
+    int random_x = max(abs(rand()) % (screen_width - 100), 10),  random_y = max(abs(rand()) % (screen_height - 100), 15);
+    if (random_x > (screen_width - 10)) random_x = screen_width - 15;
+    if (random_y > (screen_height - 10)) random_y = screen_width - 15;
+    
     SDL_Rect khabar = {random_x, random_y, segmentSize + 10, segmentSize + 10};  //for food
 
     vBarrier barriers;
@@ -224,22 +227,31 @@ int main() {
             if(collitionSnake(newMatha, snake) || collition_barrier(newMatha, barriers)) {
                 quit = true;  //terminates the game
             }
+
             SDL_Rect head_rect = {snake[0].x, snake[0].y, segmentSize, segmentSize}, khabar_rect = khabar;
             //food collision 
             if (SDL_HasIntersection(&head_rect, &khabar_rect)) {
                 points++;
                 int new_random_x = abs(rand()) % screen_width, new_random_y = abs(rand()) % screen_height;
+                new_random_x = max(abs(rand()) % (screen_width - 100), 10),  new_random_y = max(abs(rand()) % (screen_height - 100), 15);
+                if (new_random_x > (screen_width - 10)) new_random_x = screen_width - 15;
+                if (new_random_y > (screen_height - 10)) new_random_y = screen_width - 15;
                 khabar = {new_random_x, new_random_y, segmentSize + 10, segmentSize + 10}; 
                 snakeSegment tail = snake.back();
                 for (int i = 0; i < 3; ++i) {
                     snake.push_back(tail);
                 }
                 if (points % 2 == 0) {
-                    bonus = {rand() % (screen_width / segmentSize) * segmentSize, rand() % (screen_height / segmentSize) * segmentSize, true, SDL_GetTicks()};
-                          
+                    int bonus_random_x = max(abs(rand()) % (screen_width - 100), 10),  bonus_random_y = max(abs(rand()) % (screen_height - 100), 15);
+                    if (bonus_random_x > (screen_width - 10)) bonus_random_x = screen_width - 15;
+                    if (bonus_random_y > (screen_height - 10)) bonus_random_y = screen_width - 15;
+                    // bonus = {rand() % (screen_width / segmentSize) * segmentSize, rand() % (screen_height / segmentSize) * segmentSize, true, SDL_GetTicks()};
+                    bonus = {bonus_random_x, bonus_random_y, true, SDL_GetTicks()};      
                 }
 
             }
+
+
             SDL_Rect bonusFoodRect = {bonus.x, bonus.y, segmentSize + 15, segmentSize + 15 };
             if(bonus.ok && SDL_HasIntersection(&head_rect, &bonusFoodRect)) {
                 points += 10;
@@ -250,14 +262,14 @@ int main() {
             for (int i = snake.size() - 1; i > 0; i--) {
                 snake[i] = snake[i - 1];
             }
+            snake[0] = newMatha;
+
 
             // save  high score
             if (points > highScore) {
                 highScore = points;
                 saveHighScore(highScore);
             }
-
-            snake[0] = newMatha;
 
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderClear(renderer);
@@ -266,7 +278,7 @@ int main() {
             SDL_SetRenderDrawColor(renderer, rand() % 255,rand() % 150 , rand() % 255, 255);
             SDL_RenderFillRect(renderer, &khabar);
             if (bonus.ok) {
-                SDL_SetRenderDrawColor(renderer, 0, 123, 255, 255);  // blue color for bonus food
+                SDL_SetRenderDrawColor(renderer, min(rand() % 255, 150), 0, 255, 255);  
                 //SDL_Rect bonusFoodRect = {bonus.x, bonus.y, segmentSize + 15, segmentSize + 15 };
                 SDL_RenderFillRect(renderer, &bonusFoodRect);
             }
