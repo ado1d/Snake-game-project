@@ -80,6 +80,33 @@ void renderText(SDL_Renderer *renderer, TTF_Font *font, const string &text, int 
     SDL_DestroyTexture(texture);
 }
 
+//to store high score
+string highScoreFileName = "highscore.txt";
+void saveHighScore(int highScore) {
+    ofstream file(highScoreFileName);
+    if (file.is_open()) {
+        file << highScore;
+        file.close();
+    } else {
+        cerr << "Unable to open the high score file for writing." << std::endl;
+    }
+}
+
+int loadHighScore() {
+    ifstream file(highScoreFileName);
+    int highScore = 0;
+
+    if (file.is_open()) {
+        file >> highScore;
+        file.close();
+    } else {
+        cerr << "Unable to open the high score file for reading. Creating a new file." << std::endl;
+        saveHighScore(highScore);
+    }
+
+    return highScore;
+}
+
 int main() {
 
     SDL_Window *window = nullptr;
@@ -99,7 +126,7 @@ int main() {
 
 
     TTF_Font *font = TTF_OpenFont("E:\\Bungee_Spice\\BungeeSpice-Regular.ttf", 25);
-
+    int highScore = loadHighScore();
 
     if (!font) {
         cerr << "Error: Font not found\nTTF Error: " << TTF_GetError() << '\n';
@@ -223,6 +250,13 @@ int main() {
             for (int i = snake.size() - 1; i > 0; i--) {
                 snake[i] = snake[i - 1];
             }
+
+            // save  high score
+            if (points > highScore) {
+                highScore = points;
+                saveHighScore(highScore);
+            }
+
             snake[0] = newMatha;
 
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -250,6 +284,7 @@ int main() {
                 SDL_RenderFillRect(renderer, &rect);
             }
             renderText(renderer, font, "Points: " + to_string(points), 10, 10);
+            renderText(renderer, font, "High Score: " + to_string(highScore), 10, 40);
             SDL_RenderPresent(renderer);
             // int i = 50;
             // i = max(0, i - 5);
