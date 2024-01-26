@@ -15,6 +15,10 @@ const int staring_y = 480;
 
 const int bonusFoodTimer = 4000;  //for 4 sec bonus food
 
+int starting_delay = 50;
+int min_delay = 15;
+
+
 struct snakeSegment {
     int x, y;
 };
@@ -249,7 +253,9 @@ int main() {
             SDL_RenderPresent(renderer);
             // int i = 50;
             // i = max(0, i - 5);
-            SDL_Delay(40);
+            int current_delay = starting_delay - points * 2;
+            current_delay = max(current_delay, min_delay);
+            SDL_Delay(current_delay);
             
         }else if (paused) {
             // TTF_Font *newFont = TTF_OpenFont("E:\\Bungee_Spice\\BungeeSpice-Regular.ttf", 40);
